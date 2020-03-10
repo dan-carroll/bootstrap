@@ -7,7 +7,7 @@
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./polyfill.js')) :
   typeof define === 'function' && define.amd ? define(['./polyfill.js'], factory) :
   (global = global || self, global.EventHandler = factory(global.Polyfill));
-}(this, function (polyfill_js) { 'use strict';
+}(this, (function (polyfill_js) { 'use strict';
 
   /**
    * --------------------------------------------------------------------------
@@ -15,8 +15,17 @@
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
    * --------------------------------------------------------------------------
    */
-  var _window = window,
-      jQuery = _window.jQuery; // Shoutout AngusCroll (https://goo.gl/pxwQGp)
+
+  var getjQuery = function getjQuery() {
+    var _window = window,
+        jQuery = _window.jQuery;
+
+    if (jQuery && !document.body.hasAttribute('data-no-jquery')) {
+      return jQuery;
+    }
+
+    return null;
+  };
 
   /**
    * --------------------------------------------------------------------------
@@ -30,6 +39,7 @@
    * ------------------------------------------------------------------------
    */
 
+  var $ = getjQuery();
   var namespaceRegex = /[^.]*(?=\..*)\.|.*/;
   var stripNameRegex = /\..*/;
   var keyEventRegex = /^key/;
@@ -229,7 +239,7 @@
 
       if (isNamespace) {
         Object.keys(events).forEach(function (elementEvent) {
-          removeNamespacedHandlers(element, events, elementEvent, originalTypeEvent.substr(1));
+          removeNamespacedHandlers(element, events, elementEvent, originalTypeEvent.slice(1));
         });
       }
 
@@ -257,9 +267,9 @@
       var defaultPrevented = false;
       var evt = null;
 
-      if (inNamespace && typeof jQuery !== 'undefined') {
-        jQueryEvent = jQuery.Event(event, args);
-        jQuery(element).trigger(jQueryEvent);
+      if (inNamespace && $) {
+        jQueryEvent = $.Event(event, args);
+        $(element).trigger(jQueryEvent);
         bubbles = !jQueryEvent.isPropagationStopped();
         nativeDispatch = !jQueryEvent.isImmediatePropagationStopped();
         defaultPrevented = jQueryEvent.isDefaultPrevented();
@@ -312,5 +322,5 @@
 
   return EventHandler;
 
-}));
+})));
 //# sourceMappingURL=event-handler.js.map

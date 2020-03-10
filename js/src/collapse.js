@@ -6,10 +6,11 @@
  */
 
 import {
-  jQuery as $,
+  getjQuery,
   TRANSITION_END,
   emulateTransitionEnd,
   getSelectorFromElement,
+  getElementFromSelector,
   getTransitionDurationFromElement,
   isElement,
   makeArray,
@@ -80,8 +81,8 @@ class Collapse {
     this._element = element
     this._config = this._getConfig(config)
     this._triggerArray = makeArray(SelectorEngine.find(
-      `[data-toggle="collapse"][href="#${element.id}"],` +
-      `[data-toggle="collapse"][data-target="#${element.id}"]`
+      `${Selector.DATA_TOGGLE}[href="#${element.id}"],` +
+      `${Selector.DATA_TOGGLE}[data-target="#${element.id}"]`
     ))
 
     const toggleList = makeArray(SelectorEngine.find(Selector.DATA_TOGGLE))
@@ -172,7 +173,7 @@ class Collapse {
     if (actives) {
       actives.forEach(elemActive => {
         if (container !== elemActive) {
-          Collapse._collapseInterface(elemActive, 'hide')
+          Collapse.collapseInterface(elemActive, 'hide')
         }
 
         if (!activesData) {
@@ -244,15 +245,11 @@ class Collapse {
     if (triggerArrayLength > 0) {
       for (let i = 0; i < triggerArrayLength; i++) {
         const trigger = this._triggerArray[i]
-        const selector = getSelectorFromElement(trigger)
+        const elem = getElementFromSelector(trigger)
 
-        if (selector !== null) {
-          const elem = SelectorEngine.findOne(selector)
-
-          if (!elem.classList.contains(ClassName.SHOW)) {
-            trigger.classList.add(ClassName.COLLAPSED)
-            trigger.setAttribute('aria-expanded', false)
-          }
+        if (elem && !elem.classList.contains(ClassName.SHOW)) {
+          trigger.classList.add(ClassName.COLLAPSED)
+          trigger.setAttribute('aria-expanded', false)
         }
       }
     }
@@ -316,12 +313,14 @@ class Collapse {
       parent = SelectorEngine.findOne(parent)
     }
 
-    const selector = `[data-toggle="collapse"][data-parent="${parent}"]`
+    const selector = `${Selector.DATA_TOGGLE}[data-parent="${parent}"]`
 
     makeArray(SelectorEngine.find(selector, parent))
       .forEach(element => {
+        const selected = getElementFromSelector(element)
+
         this._addAriaAndCollapsedClass(
-          Collapse._getTargetFromElement(element),
+          selected,
           [element]
         )
       })
@@ -349,12 +348,7 @@ class Collapse {
 
   // Static
 
-  static _getTargetFromElement(element) {
-    const selector = getSelectorFromElement(element)
-    return selector ? SelectorEngine.findOne(selector) : null
-  }
-
-  static _collapseInterface(element, config) {
+  static collapseInterface(element, config) {
     let data = Data.getData(element, DATA_KEY)
     const _config = {
       ...Default,
@@ -379,13 +373,13 @@ class Collapse {
     }
   }
 
-  static _jQueryInterface(config) {
+  static jQueryInterface(config) {
     return this.each(function () {
-      Collapse._collapseInterface(this, config)
+      Collapse.collapseInterface(this, config)
     })
   }
 
-  static _getInstance(element) {
+  static getInstance(element) {
     return Data.getData(element, DATA_KEY)
   }
 }
@@ -421,9 +415,11 @@ EventHandler.on(document, Event.CLICK_DATA_API, Selector.DATA_TOGGLE, function (
       config = triggerData
     }
 
-    Collapse._collapseInterface(element, config)
+    Collapse.collapseInterface(element, config)
   })
 })
+
+const $ = getjQuery()
 
 /**
  * ------------------------------------------------------------------------
@@ -431,14 +427,14 @@ EventHandler.on(document, Event.CLICK_DATA_API, Selector.DATA_TOGGLE, function (
  * ------------------------------------------------------------------------
  * add .collapse to jQuery only if jQuery is present
  */
-
-if (typeof $ !== 'undefined') {
+/* istanbul ignore if */
+if ($) {
   const JQUERY_NO_CONFLICT = $.fn[NAME]
-  $.fn[NAME] = Collapse._jQueryInterface
+  $.fn[NAME] = Collapse.jQueryInterface
   $.fn[NAME].Constructor = Collapse
   $.fn[NAME].noConflict = () => {
     $.fn[NAME] = JQUERY_NO_CONFLICT
-    return Collapse._jQueryInterface
+    return Collapse.jQueryInterface
   }
 }
 

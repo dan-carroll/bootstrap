@@ -15,7 +15,9 @@ Alternative browsers which use the latest version of WebKit, Blink, or Gecko, wh
 You can find our supported range of browsers and their versions [in our `.browserslistrc file`]({{< param repo >}}/blob/v{{< param current_version >}}/.browserslistrc):
 
 ```text
-{{< rf.inline >}}{{ readFile ".browserslistrc" | htmlEscape }}{{< /rf.inline >}}
+{{< rf.inline >}}
+{{- readFile ".browserslistrc" | htmlEscape -}}
+{{< /rf.inline >}}
 ```
 
 We use [Autoprefixer](https://github.com/postcss/autoprefixer) to handle intended browser support via CSS prefixes, which uses [Browserslist](https://github.com/browserslist/browserslist) to manage these browser versions. Consult their documentation for how to integrate these tools into your projects.
@@ -32,7 +34,6 @@ Generally speaking, Bootstrap supports the latest versions of each major platfor
       <th>Firefox</th>
       <th>Safari</th>
       <th>Android Browser &amp; WebView</th>
-      <th>Microsoft Edge</th>
     </tr>
   </thead>
   <tbody>
@@ -41,8 +42,7 @@ Generally speaking, Bootstrap supports the latest versions of each major platfor
       <td>Supported</td>
       <td>Supported</td>
       <td class="text-muted">&mdash;</td>
-      <td>v5.0+</td>
-      <td>Supported</td>
+      <td>v6.0+</td>
     </tr>
     <tr>
       <th scope="row">iOS</th>
@@ -50,15 +50,6 @@ Generally speaking, Bootstrap supports the latest versions of each major platfor
       <td>Supported</td>
       <td>Supported</td>
       <td class="text-muted">&mdash;</td>
-      <td>Supported</td>
-    </tr>
-    <tr>
-      <th scope="row" class="text-nowrap">Windows 10 Mobile</th>
-      <td class="text-muted">&mdash;</td>
-      <td class="text-muted">&mdash;</td>
-      <td class="text-muted">&mdash;</td>
-      <td class="text-muted">&mdash;</td>
-      <td>Supported</td>
     </tr>
   </tbody>
 </table>
@@ -85,7 +76,7 @@ Similarly, the latest versions of most desktop browsers are supported.
       <td>Supported</td>
       <td>Supported</td>
       <td class="text-muted">&mdash;</td>
-      <td class="text-muted">&mdash;</td>
+      <td>Supported</td>
       <td>Supported</td>
       <td>Supported</td>
     </tr>
@@ -105,11 +96,9 @@ For Firefox, in addition to the latest normal stable release, we also support th
 
 Unofficially, Bootstrap should look and behave well enough in Chromium and Chrome for Linux, Firefox for Linux, and Internet Explorer 9, though they are not officially supported.
 
-For a list of some of the browser bugs that Bootstrap has to grapple with, see our [Wall of browser bugs]({{< docsref "/browser-bugs" >}}).
-
 ## Internet Explorer
 
-Internet Explorer 11 is supported; IE10 and down is not. Please be aware that some CSS3 properties and HTML5 elements are not fully supported in IE10, or require prefixed properties for full functionality. Visit [Can I use...](https://caniuse.com/) for details on browser support of CSS3 and HTML5 features. **If you require IE8-9 support, use Bootstrap 3.**
+Internet Explorer 11 is supported; IE10 and down is not. Please be aware that some CSS3 properties and HTML5 elements are not fully supported in Internet Explorer, or require prefixed properties for full functionality. Visit [Can I use...](https://caniuse.com/) for details on browser support of CSS3 and HTML5 features. **If you require IE10 support, use Bootstrap 4.**
 
 ## Modals and dropdowns on mobile
 
@@ -123,7 +112,7 @@ As of iOS 9.2, while a modal is open, if the initial touch of a scroll gesture i
 
 ### Navbar Dropdowns
 
-The `.dropdown-backdrop` element isn't used on iOS in the nav because of the complexity of z-indexing. Thus, to close dropdowns in navbars, you must directly click the dropdown element (or [any other element which will fire a click event in iOS](https://developer.mozilla.org/en-US/docs/Web/Events/click#Safari_Mobile)).
+The `.dropdown-backdrop` element isn't used on iOS in the nav because of the complexity of z-indexing. Thus, to close dropdowns in navbars, you must directly click the dropdown element (or [any other element which will fire a click event in iOS](https://developer.mozilla.org/en-US/docs/Web/API/Element/click_event#Safari_Mobile)).
 
 ## Browser zooming
 

@@ -103,22 +103,24 @@ Custom feedback styles apply custom colors, borders, focus styles, and backgroun
 
 <script>
 // Example starter JavaScript for disabling form submissions if there are invalid fields
-(function() {
+(function () {
   'use strict';
-  window.addEventListener('load', function() {
-    // Fetch all the forms we want to apply custom Bootstrap validation styles to
-    var forms = document.getElementsByClassName('needs-validation');
-    // Loop over them and prevent submission
-    var validation = Array.prototype.filter.call(forms, function(form) {
-      form.addEventListener('submit', function(event) {
-        if (form.checkValidity() === false) {
+
+  // Fetch all the forms we want to apply custom Bootstrap validation styles to
+  var forms = document.querySelectorAll('.needs-validation');
+
+  // Loop over them and prevent submission
+  Array.prototype.slice.call(forms)
+    .forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
           event.preventDefault();
           event.stopPropagation();
         }
+
         form.classList.add('was-validated');
       }, false);
     });
-  }, false);
 })();
 </script>
 {{< /example >}}
@@ -259,9 +261,8 @@ We recommend using client-side validation, but in case you require server-side v
 Validation styles are available for the following form controls and components:
 
 - `<input>`s and `<textarea>`s with `.form-control` (including up to one `.form-control` in input groups)
-- `<select>`s with `.form-control` or `.form-select`
+- `<select>`s with `.form-select`
 - `.form-check`s
-- `.custom-checkbox`s and `.custom-radio`s
 - `.form-file`
 
 {{< example >}}
@@ -274,19 +275,19 @@ Validation styles are available for the following form controls and components:
     </div>
   </div>
 
-  <div class="custom-control custom-checkbox mb-3">
-    <input type="checkbox" class="custom-control-input" id="customControlValidation1" required>
-    <label class="custom-control-label" for="customControlValidation1">Check this custom checkbox</label>
+  <div class="form-check mb-3">
+    <input type="checkbox" class="form-check-input" id="validationFormCheck1" required>
+    <label class="form-check-label" for="validationFormCheck1">Check this checkbox</label>
     <div class="invalid-feedback">Example invalid feedback text</div>
   </div>
 
-  <div class="custom-control custom-radio">
-    <input type="radio" class="custom-control-input" id="customControlValidation2" name="radio-stacked" required>
-    <label class="custom-control-label" for="customControlValidation2">Toggle this custom radio</label>
+  <div class="form-check">
+    <input type="radio" class="form-check-input" id="validationFormCheck2" name="radio-stacked" required>
+    <label class="form-check-label" for="validationFormCheck2">Toggle this radio</label>
   </div>
-  <div class="custom-control custom-radio mb-3">
-    <input type="radio" class="custom-control-input" id="customControlValidation3" name="radio-stacked" required>
-    <label class="custom-control-label" for="customControlValidation3">Or toggle this other custom radio</label>
+  <div class="form-check mb-3">
+    <input type="radio" class="form-check-input" id="validationFormCheck3" name="radio-stacked" required>
+    <label class="form-check-label" for="validationFormCheck3">Or toggle this other radio</label>
     <div class="invalid-feedback">More example invalid feedback text</div>
   </div>
 
@@ -297,13 +298,16 @@ Validation styles are available for the following form controls and components:
       <option value="2">Two</option>
       <option value="3">Three</option>
     </select>
-    <div class="invalid-feedback">Example invalid custom select feedback</div>
+    <div class="invalid-feedback">Example invalid select feedback</div>
   </div>
 
   <div class="form-file">
-    <input type="file" class="form-file-input" id="validatedCustomFile" required>
-    <label class="form-file-label" for="validatedCustomFile">Choose file...</label>
-    <div class="invalid-feedback">Example invalid custom file feedback</div>
+    <input type="file" class="form-file-input" id="validationFormFile" required>
+    <label class="form-file-label" for="validationFormFile">
+      <span class="form-file-text">Choose file...</span>
+      <span class="form-file-button">Browse</span>
+    </label>
+    <div class="invalid-feedback">Example invalid form file feedback</div>
   </div>
 </form>
 {{< /example >}}
@@ -381,18 +385,15 @@ Please note that we do not recommend customizing these values without also modif
 {{< highlight scss >}}
 // Sass map from `_variables.scss`
 // Override this and recompile your Sass to generate different states
-$form-validation-states: map-merge(
-  (
-    "valid": (
-      "color": $form-feedback-valid-color,
-      "icon": $form-feedback-icon-valid
-    ),
-    "invalid": (
-      "color": $form-feedback-invalid-color,
-      "icon": $form-feedback-icon-invalid
-    )
+$form-validation-states: (
+  "valid": (
+    "color": $form-feedback-valid-color,
+    "icon": $form-feedback-icon-valid
   ),
-  $form-validation-states
+  "invalid": (
+    "color": $form-feedback-invalid-color,
+    "icon": $form-feedback-icon-invalid
+  )
 );
 
 // Loop from `_forms.scss`

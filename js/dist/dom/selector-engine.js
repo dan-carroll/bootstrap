@@ -7,7 +7,7 @@
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./polyfill.js')) :
   typeof define === 'function' && define.amd ? define(['./polyfill.js'], factory) :
   (global = global || self, global.SelectorEngine = factory(global.Polyfill));
-}(this, function (polyfill_js) { 'use strict';
+}(this, (function (polyfill_js) { 'use strict';
 
   /**
    * --------------------------------------------------------------------------
@@ -15,8 +15,6 @@
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
    * --------------------------------------------------------------------------
    */
-  var _window = window,
-      jQuery = _window.jQuery; // Shoutout AngusCroll (https://goo.gl/pxwQGp)
 
   var makeArray = function makeArray(nodeList) {
     if (!nodeList) {
@@ -48,10 +46,6 @@
         element = document.documentElement;
       }
 
-      if (typeof selector !== 'string') {
-        return null;
-      }
-
       return polyfill_js.find.call(element, selector);
     },
     findOne: function findOne(selector, element) {
@@ -59,18 +53,10 @@
         element = document.documentElement;
       }
 
-      if (typeof selector !== 'string') {
-        return null;
-      }
-
       return polyfill_js.findOne.call(element, selector);
     },
     children: function children(element, selector) {
       var _this = this;
-
-      if (typeof selector !== 'string') {
-        return null;
-      }
 
       var children = makeArray(element.children);
       return children.filter(function (child) {
@@ -78,10 +64,6 @@
       });
     },
     parents: function parents(element, selector) {
-      if (typeof selector !== 'string') {
-        return null;
-      }
-
       var parents = [];
       var ancestor = element.parentNode;
 
@@ -96,17 +78,9 @@
       return parents;
     },
     closest: function closest(element, selector) {
-      if (typeof selector !== 'string') {
-        return null;
-      }
-
       return polyfill_js.closest.call(element, selector);
     },
     prev: function prev(element, selector) {
-      if (typeof selector !== 'string') {
-        return null;
-      }
-
       var siblings = [];
       var previous = element.previousSibling;
 
@@ -124,5 +98,5 @@
 
   return SelectorEngine;
 
-}));
+})));
 //# sourceMappingURL=selector-engine.js.map

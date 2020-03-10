@@ -22,7 +22,7 @@ When successfully implemented, your nav or list group will update accordingly, m
 Scroll the area below the navbar and watch the active class change. The dropdown items will be highlighted as well.
 
 <div class="bd-example">
-  <nav id="navbar-example2" class="navbar navbar-light bg-light">
+  <nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
     <a class="navbar-brand" href="#">Navbar</a>
     <ul class="nav nav-pills">
       <li class="nav-item">
@@ -33,7 +33,7 @@ Scroll the area below the navbar and watch the active class change. The dropdown
       </li>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-expanded="false">Dropdown</a>
-        <div class="dropdown-menu">
+        <div class="dropdown-menu dropdown-menu-right">
           <a class="dropdown-item" href="#one">one</a>
           <a class="dropdown-item" href="#two">two</a>
           <div role="separator" class="dropdown-divider"></div>
@@ -59,7 +59,7 @@ Scroll the area below the navbar and watch the active class change. The dropdown
 </div>
 
 {{< highlight html >}}
-<nav id="navbar-example2" class="navbar navbar-light bg-light">
+<nav id="navbar-example2" class="navbar navbar-light bg-light px-3">
   <a class="navbar-brand" href="#">Navbar</a>
   <ul class="nav nav-pills">
     <li class="nav-item">
@@ -70,7 +70,7 @@ Scroll the area below the navbar and watch the active class change. The dropdown
     </li>
     <li class="nav-item dropdown">
       <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-expanded="false">Dropdown</a>
-      <div class="dropdown-menu">
+      <div class="dropdown-menu dropdown-menu-right">
         <a class="dropdown-item" href="#one">one</a>
         <a class="dropdown-item" href="#two">two</a>
         <div role="separator" class="dropdown-divider"></div>
@@ -252,7 +252,9 @@ body {
 After adding `position: relative;` in your CSS, call the scrollspy via JavaScript:
 
 {{< highlight js >}}
-$('body').scrollspy({ target: '#navbar-example' })
+var scrollSpy = new bootstrap.ScrollSpy(document.body, {
+  target: '#navbar-example'
+})
 {{< /highlight >}}
 
 {{< callout danger >}}
@@ -269,19 +271,30 @@ Target elements that are not visible will be ignored and their corresponding nav
 
 ### Methods
 
-#### `.scrollspy('refresh')`
+#### refresh
 
 When using scrollspy in conjunction with adding or removing of elements from the DOM, you'll need to call the refresh method like so:
 
 {{< highlight js >}}
-$('[data-spy="scroll"]').each(function () {
-  var $spy = $(this).scrollspy('refresh')
+var dataSpyList = [].slice.call(document.querySelectorAll('[data-spy="scroll"]'))
+dataSpyList.forEach(function (dataSpyEl) {
+  bootstrap.ScrollSpy.getInstance(dataSpyEl)
+    .refresh()
 })
 {{< /highlight >}}
 
-#### `.scrollspy('dispose')`
+#### dispose
 
 Destroys an element's scrollspy.
+
+#### getInstance
+
+*Static* method which allows you to get the scrollspy instance associated with a DOM element
+
+{{< highlight js >}}
+var scrollSpyContentEl = document.getElementById('content')
+var scrollSpy = bootstrap.ScrollSpy.getInstance(scrollSpyContentEl) // Returns a Bootstrap scrollspy instance
+{{< /highlight >}}
 
 ### Options
 
@@ -307,7 +320,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
       <td>method</td>
       <td>string</td>
       <td>auto</td>
-      <td>Finds which section the spied element is in. <code>auto</code> will choose the best method get scroll coordinates. <code>offset</code> will use the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect"><code>Element.getBoundingClientRect()</code></a> method to get scroll coordinates. <code>position</code> will use the <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetTop"><code>HTMLElement.offsetTop</code></a> and <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetLeft"><code>HTMLElement.offsetLeft</code></a> properties to get scroll coordinates.</td>
+      <td>Finds which section the spied element is in. <code>auto</code> will choose the best method to get scroll coordinates. <code>offset</code> will use the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect"><code>Element.getBoundingClientRect()</code></a> method to get scroll coordinates. <code>position</code> will use the <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetTop"><code>HTMLElement.offsetTop</code></a> and <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetLeft"><code>HTMLElement.offsetLeft</code></a> properties to get scroll coordinates.</td>
     </tr>
     <tr>
       <td>target</td>
@@ -336,7 +349,8 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 </table>
 
 {{< highlight js >}}
-$('[data-spy="scroll"]').on('activate.bs.scrollspy', function () {
+var firstScrollSpyEl = document.querySelector('[data-spy="scroll"]')
+firstScrollSpyEl.addEventListener('activate.bs.scrollspy', function () {
   // do something...
 })
 {{< /highlight >}}

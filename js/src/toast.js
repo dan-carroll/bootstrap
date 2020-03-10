@@ -6,10 +6,11 @@
  */
 
 import {
-  jQuery as $,
+  getjQuery,
   TRANSITION_END,
   emulateTransitionEnd,
   getTransitionDurationFromElement,
+  reflow,
   typeCheckConfig
 } from './util/index'
 import Data from './dom/data'
@@ -114,6 +115,7 @@ class Toast {
     }
 
     this._element.classList.remove(ClassName.HIDE)
+    reflow(this._element)
     this._element.classList.add(ClassName.SHOWING)
     if (this._config.animation) {
       const transitionDuration = getTransitionDurationFromElement(this._element)
@@ -196,7 +198,7 @@ class Toast {
 
   // Static
 
-  static _jQueryInterface(config) {
+  static jQueryInterface(config) {
     return this.each(function () {
       let data = Data.getData(this, DATA_KEY)
       const _config = typeof config === 'object' && config
@@ -215,10 +217,12 @@ class Toast {
     })
   }
 
-  static _getInstance(element) {
+  static getInstance(element) {
     return Data.getData(element, DATA_KEY)
   }
 }
+
+const $ = getjQuery()
 
 /**
  * ------------------------------------------------------------------------
@@ -226,14 +230,14 @@ class Toast {
  * ------------------------------------------------------------------------
  *  add .toast to jQuery only if jQuery is present
  */
-
-if (typeof $ !== 'undefined') {
+/* istanbul ignore if */
+if ($) {
   const JQUERY_NO_CONFLICT = $.fn[NAME]
-  $.fn[NAME] = Toast._jQueryInterface
+  $.fn[NAME] = Toast.jQueryInterface
   $.fn[NAME].Constructor = Toast
   $.fn[NAME].noConflict = () => {
     $.fn[NAME] = JQUERY_NO_CONFLICT
-    return Toast._jQueryInterface
+    return Toast.jQueryInterface
   }
 }
 

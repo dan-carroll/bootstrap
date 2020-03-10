@@ -94,48 +94,63 @@ Repeat as necessary for any variable in Bootstrap, including the global options 
 
 ### Maps and loops
 
-Bootstrap 4 includes a handful of Sass maps, key value pairs that make it easier to generate families of related CSS. We use Sass maps for our colors, grid breakpoints, and more. Just like Sass variables, all Sass maps include the `!default` flag and can be overridden and extended.
+Bootstrap 5 includes a handful of Sass maps, key value pairs that make it easier to generate families of related CSS. We use Sass maps for our colors, grid breakpoints, and more. Just like Sass variables, all Sass maps include the `!default` flag and can be overridden and extended.
 
-Some of our Sass maps are merged into empty ones by default. This is done to allow easy expansion of a given Sass map, but comes at the cost of making _removing_ items from a map slightly more difficult.
+From Bootstrap 5, we decided to [ditch the map merges](https://github.com/twbs/bootstrap/pull/28508) we had in `v4`. This way we have more control over removing redundant values.
 
 #### Modify map
 
-To modify an existing color in our `$theme-colors` map, add the following to your custom Sass file:
+All variables in the `$theme-colors` map are defined as standalone variables. To modify an existing color in our `$theme-colors` map, add the following to your custom Sass file:
+
+{{< highlight scss >}}
+$primary: #0074d9;
+$danger: #ff4136;
+{{< /highlight >}}
+
+Later on, theses variables are set in Bootstrap's `$theme-colors` map:
 
 {{< highlight scss >}}
 $theme-colors: (
-  "primary": #0074d9,
-  "danger": #ff4136
+  "primary": $primary,
+  "danger": $danger,
+  ...
 );
 {{< /highlight >}}
 
 #### Add to map
 
-To add a new color to `$theme-colors`, add the new key and value:
+To add a new color to `$theme-colors`, add the new key and value. Keep in mind not to remove the existing colors:
 
 {{< highlight scss >}}
+$my-custom-color: #ffoodd;
+
+// Make sure to define `$primary`, `$secondary`, ect.. first
 $theme-colors: (
-  "custom-color": #900
+  "primary":      $primary,
+  "secondary":    $secondary,
+  "success":      $success,
+  "info":         $info,
+  "warning":      $warning,
+  "danger":       $danger,
+  "light":        $light,
+  "dark":         $dark,
+  "custom-color": $my-custom-color,
 );
 {{< /highlight >}}
 
 #### Remove from map
 
-To remove colors from `$theme-colors`, or any other map, use `map-remove`. Be aware you must insert it between our requirements and options:
+From Bootstrap 5, this is simplified quite a lot, just remove the redundant items from the Sass map:
 
 {{< highlight scss >}}
-// Required
-@import "../node_modules/bootstrap/scss/functions";
-@import "../node_modules/bootstrap/scss/variables";
-@import "../node_modules/bootstrap/scss/mixins";
-
-$theme-colors: map-remove($theme-colors, "info", "light", "dark");
-
-// Optional
-@import "../node_modules/bootstrap/scss/root";
-@import "../node_modules/bootstrap/scss/reboot";
-@import "../node_modules/bootstrap/scss/type";
-...
+// Make sure to define `$primary`, `$secondary`, ect.. first
+$theme-colors: (
+  "primary":      $primary,
+  "secondary":    $secondary,
+  "success":      $success,
+  "warning":      $warning,
+  "danger":       $danger,
+);
 {{< /highlight >}}
 
 #### Required keys
@@ -146,36 +161,19 @@ For example, we use the `primary`, `success`, and `danger` keys from `$theme-col
 
 ### Functions
 
-Bootstrap utilizes several Sass functions, but only a subset are applicable to general theming. We've included three functions for getting values from the color maps:
-
-{{< highlight scss >}}
-@function color($key: "blue") {
-  @return map-get($colors, $key);
-}
-
-@function theme-color($key: "primary") {
-  @return map-get($theme-colors, $key);
-}
-
-@function gray($key: "100") {
-  @return map-get($grays, $key);
-}
-{{< /highlight >}}
-
-These allow you to pick one color from a Sass map much like how you'd use a color variable from v3.
+In Bootstrap 5, we've dropped the `color()`, `theme-color()` and `gray()` functions because the values are also available as standalone variables. So instead of using `theme-color("primary")`, you can now just use the `$primary` variable.
 
 {{< highlight scss >}}
 .custom-element {
-  color: gray("100");
-  background-color: theme-color("dark");
+  color: $gray-100;
+  background-color: $dark;
 }
 {{< /highlight >}}
 
-We also have another function for getting a particular _level_ of color from the `$theme-colors` map. Negative level values will lighten the color, while higher levels will darken.
+We also have a function for getting a particular _level_ of color. Negative level values will lighten the color, while higher levels will darken.
 
 {{< highlight scss >}}
-@function theme-color-level($color-name: "primary", $level: 0) {
-  $color: theme-color($color-name);
+@function color-level($color: $primary, $level: 0) {
   $color-base: if($level > 0, #000, #fff);
   $level: abs($level);
 
@@ -187,13 +185,11 @@ In practice, you'd call the function and pass in two parameters: the name of the
 
 {{< highlight scss >}}
 .custom-element {
-  color: theme-color-level(primary, -10);
+  color: color-level($primary, -10);
 }
 {{< /highlight >}}
 
-Additional functions could be added in the future or your own custom Sass to create level functions for additional Sass maps, or even a generic one if you wanted to be more verbose.
-
-### Color contrast
+#### Color contrast
 
 An additional function we include in Bootstrap is the color contrast function, `color-yiq`. It utilizes the [YIQ color space](https://en.wikipedia.org/wiki/YIQ) to automatically return a light (`#fff`) or dark (`#111`) contrast color based on the specified base color. This function is especially useful for mixins or loops where you're generating multiple classes.
 
@@ -219,13 +215,51 @@ You can also specify a base color with our color map functions:
 
 {{< highlight scss >}}
 .custom-element {
-  color: color-yiq(theme-color("dark")); // returns `color: #fff`
+  color: color-yiq($dark); // returns `color: #fff`
 }
 {{< /highlight >}}
 
-## Escape SVG
+#### Escape SVG
 
 We use the `escape-svg` function to escape the `<`, `>` and `#` characters for SVG background images. These characters need to be escaped to properly render the background images in IE.
+
+#### Add and Subtract functions
+
+We use the `add` and `subtract` functions to wrap the CSS `calc` function. The primary purpose of these functions is to avoid errors when a "unitless" `0` value is passed into a `calc` expression. Expressions like `calc(10px - 0)` will return an error in all browsers, despite being mathematically correct.
+
+Example where the calc is valid:
+
+{{< highlight scss >}}
+$border-radius: .25rem;
+$border-width: 1px;
+
+.element {
+  // Output calc(.25rem - 1px) is valid
+  border-radius: calc($border-radius - $border-width);
+}
+
+.element {
+  // Output the same calc(.25rem - 1px) as above
+  border-radius: subtract($border-radius, $border-width);
+}
+{{< /highlight >}}
+
+Example where the calc is invalid:
+
+{{< highlight scss >}}
+$border-radius: .25rem;
+$border-width: 0;
+
+.element {
+  // Output calc(.25rem - 0) is invalid
+  border-radius: calc($border-radius - $border-width);
+}
+
+.element {
+  // Output .25rem
+  border-radius: subtract($border-radius, $border-width);
+}
+{{< /highlight >}}
 
 ## Sass options
 
@@ -241,13 +275,13 @@ You can find and customize these variables for key global options in Bootstrap's
 | `$enable-gradients`                          | `true` or `false` (default)        | Enables predefined gradients via `background-image` styles on various components. |
 | `$enable-transitions`                        | `true` (default) or `false`        | Enables predefined `transition`s on various components. |
 | `$enable-prefers-reduced-motion-media-query` | `true` (default) or `false`        | Enables the [`prefers-reduced-motion` media query]({{< docsref "/getting-started/accessibility#reduced-motion" >}}), which suppresses certain animations/transitions based on the users' browser/operating system preferences. |
-| `$enable-hover-media-query`                  | `true` or `false` (default)        | **Deprecated** |
-| `$enable-grid-classes`                       | `true` (default) or `false`        | Enables the generation of CSS classes for the grid system (e.g., `.container`, `.row`, `.col-md-1`, etc.). |
+| `$enable-grid-classes`                       | `true` (default) or `false`        | Enables the generation of CSS classes for the grid system (e.g. `.row`, `.col-md-1`, etc.). |
 | `$enable-caret`                              | `true` (default) or `false`        | Enables pseudo element caret on `.dropdown-toggle`. |
 | `$enable-pointer-cursor-for-buttons`         | `true` (default) or `false`        | Add "hand" cursor to non-disabled button elements. |
-| `$enable-responsive-font-sizes`              | `true` or `false` (default)        | Enables [responsive font sizes]({{< docsref "/content/typography#responsive-font-sizes" >}}). |
+| `$enable-rfs`                                | `true` (default)  or `false`       | Globally enables [RFS]({{< docsref "/getting-started/rfs" >}}). |
 | `$enable-validation-icons`                   | `true` (default) or `false`        | Enables `background-image` icons within textual inputs and some custom forms for validation states. |
 | `$enable-deprecation-messages`               | `true` or `false` (default)        | Set to `true` to show warnings when using any of the deprecated mixins and functions that are planned to be removed in `v5`. |
+| `$enable-important-utilities`                | `true` (default) or `false`        | Enables the `!important` suffix in utility classes. |
 
 ## Color
 
@@ -255,14 +289,24 @@ Many of Bootstrap's various components and utilities are built through a series 
 
 ### All colors
 
-All colors available in Bootstrap 4, are available as Sass variables and a Sass map in `scss/_variables.scss` file. This will be expanded upon in subsequent minor releases to add additional shades, much like the [grayscale palette](#grays) we already include.
+All colors available in Bootstrap 5 are available as Sass variables and as a Sass map in `scss/_variables.scss`. To avoid increased file sizes, we do not create classes for each of these variables.
+
+Sass cannot programmatically generate variables, so we must manually create them ourselves. We specify the midpoint value (`500`) and use custom color functions to tint (lighten) or shade (darken) our colors via Sass's `mix()` color function. Using `mix()` is not the same as `lighten()` and `darken()`—the former blends the specified color with white or black, while the latter only adjusts the lightness value of each color. The result is a much more complete suite of colors, as [shown in this CodePen demo](https://codepen.io/emdeoh/pen/zYOQOPB).
+
+Our `tint-color()` and `shade-color()` functions use `mix()` alongside our `$theme-color-interval` variable, which specifies a stepped percentage value for each mixed color we need. See the `scss/_functions.scss` and `scss/_variables.scss` files for the full source code.
 
 <div class="row">
   {{< theme-colors.inline >}}
-  {{- range $.Site.Data.colors }}
-    {{- if (and (not (eq .name "white")) (not (eq .name "gray")) (not (eq .name "gray-dark"))) }}
-    <div class="col-md-4">
-      <div class="p-3 mb-3 swatch-{{ .name }}">{{ .name | title }}</div>
+  {{- range $color := $.Site.Data.colors }}
+    {{- if (and (not (eq $color.name "white")) (not (eq $color.name "gray")) (not (eq $color.name "gray-dark"))) }}
+    <div class="col-md-4 mb-3 font-monospace">
+      <div class="p-3 mb-2 swatch-{{ $color.name }}">
+        <strong class="d-block">${{ $color.name }}</strong>
+        {{ $color.hex }}
+      </div>
+      {{ range (seq 100 100 900) }}
+      <div class="p-3 bd-{{ $color.name }}-{{ . }}">${{ $color.name }}-{{ . }}</div>
+      {{ end }}
     </div>
     {{ end -}}
   {{ end -}}
@@ -272,18 +316,14 @@ All colors available in Bootstrap 4, are available as Sass variables and a Sass 
 Here's how you can use these in your Sass:
 
 {{< highlight scss >}}
-// With variable
 .alpha { color: $purple; }
-
-// From the Sass map with our `color()` function
-.beta { color: color("purple"); }
+.beta {
+  color: $yellow-300;
+  background-color: $indigo-900;
+}
 {{< /highlight >}}
 
 [Color utility classes]({{< docsref "/utilities/colors" >}}) are also available for setting `color` and `background-color`.
-
-{{< callout info >}}
-In the future, we'll aim to provide Sass maps and variables for shades of each color as we've done with the grayscale colors below.
-{{< /callout >}}
 
 ### Theme colors
 
@@ -293,7 +333,7 @@ We use a subset of all colors to create a smaller color palette for generating c
   {{< theme-colors.inline >}}
   {{- range (index $.Site.Data "theme-colors") }}
     <div class="col-md-4">
-      <div class="p-3 mb-3 swatch-{{ .name }}">{{ .name | title }}</div>
+      <div class="p-3 mb-3 bg-{{ .name }} {{ if or (eq .name "light") (eq .name "warning") }}text-dark{{ else }}text-white{{ end }}">{{ .name | title }}</div>
     </div>
   {{ end -}}
   {{< /theme-colors.inline >}}
@@ -349,7 +389,7 @@ Here are two examples of how we loop over the `$theme-colors` map to generate mo
 // Generate alert modifier classes
 @each $color, $value in $theme-colors {
   .alert-#{$color} {
-    @include alert-variant(theme-color-level($color, -10), theme-color-level($color, -9), theme-color-level($color, 6));
+    @include alert-variant(color-level($color, -10), color-level($color, -9), color-level($color, 6));
   }
 }
 
@@ -379,38 +419,24 @@ Should you need to modify your `$grid-breakpoints`, your changes will apply to a
 
 ## CSS variables
 
-Bootstrap 4 includes around two dozen [CSS custom properties (variables)](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_variables) in its compiled CSS. These provide easy access to commonly used values like our theme colors, breakpoints, and primary font stacks when working in your browser's Inspector, a code sandbox, or general prototyping.
+Bootstrap 4 includes around two dozen [CSS custom properties (variables)](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties) in its compiled CSS. These provide easy access to commonly used values like our theme colors, breakpoints, and primary font stacks when working in your browser's Inspector, a code sandbox, or general prototyping.
 
 ### Available variables
 
 Here are the variables we include (note that the `:root` is required). They're located in our `_root.scss` file.
 
 {{< highlight css >}}
-:root {
-  --blue: #007bff;
-  --indigo: #6610f2;
-  --purple: #6f42c1;
-  --pink: #e83e8c;
-  --red: #dc3545;
-  --orange: #fd7e14;
-  --yellow: #ffc107;
-  --green: #28a745;
-  --teal: #20c997;
-  --cyan: #17a2b8;
-  --white: #fff;
-  --gray: #6c757d;
-  --gray-dark: #343a40;
-  --primary: #007bff;
-  --secondary: #6c757d;
-  --success: #28a745;
-  --info: #17a2b8;
-  --warning: #ffc107;
-  --danger: #dc3545;
-  --light: #f8f9fa;
-  --dark: #343a40;
-  --font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-}
+{{< root.inline >}}
+{{- $css := readFile "dist/css/bootstrap.css" -}}
+{{- $match := findRE ":root {([^}]*)}" $css 1 -}}
+
+{{- if (eq (len $match) 0) -}}
+{{- errorf "Got no matches for :root in %q!" $.Page.Path -}}
+{{- end -}}
+
+{{- index $match 0 -}}
+
+{{< /root.inline >}}
 {{< /highlight >}}
 
 ### Examples

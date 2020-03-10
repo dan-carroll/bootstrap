@@ -5,7 +5,7 @@
  * --------------------------------------------------------------------------
  */
 
-import { jQuery as $ } from './util/index'
+import { getjQuery } from './util/index'
 import Data from './dom/data'
 import SelectorEngine from './dom/selector-engine'
 import Tooltip from './tooltip'
@@ -105,10 +105,6 @@ class Popover extends Tooltip {
     return this.getTitle() || this._getContent()
   }
 
-  addAttachmentClass(attachment) {
-    this.getTipElement().classList.add(`${CLASS_PREFIX}-${attachment}`)
-  }
-
   setContent() {
     const tip = this.getTipElement()
 
@@ -125,6 +121,10 @@ class Popover extends Tooltip {
     tip.classList.remove(ClassName.SHOW)
   }
 
+  _addAttachmentClass(attachment) {
+    this.getTipElement().classList.add(`${CLASS_PREFIX}-${attachment}`)
+  }
+
   // Private
 
   _getContent() {
@@ -135,7 +135,6 @@ class Popover extends Tooltip {
   _cleanTipClass() {
     const tip = this.getTipElement()
     const tabClass = tip.getAttribute('class').match(BSCLS_PREFIX_REGEX)
-
     if (tabClass !== null && tabClass.length > 0) {
       tabClass.map(token => token.trim())
         .forEach(tClass => tip.classList.remove(tClass))
@@ -144,7 +143,7 @@ class Popover extends Tooltip {
 
   // Static
 
-  static _jQueryInterface(config) {
+  static jQueryInterface(config) {
     return this.each(function () {
       let data = Data.getData(this, DATA_KEY)
       const _config = typeof config === 'object' ? config : null
@@ -168,24 +167,26 @@ class Popover extends Tooltip {
     })
   }
 
-  static _getInstance(element) {
+  static getInstance(element) {
     return Data.getData(element, DATA_KEY)
   }
 }
+
+const $ = getjQuery()
 
 /**
  * ------------------------------------------------------------------------
  * jQuery
  * ------------------------------------------------------------------------
  */
-
-if (typeof $ !== 'undefined') {
+/* istanbul ignore if */
+if ($) {
   const JQUERY_NO_CONFLICT = $.fn[NAME]
-  $.fn[NAME] = Popover._jQueryInterface
+  $.fn[NAME] = Popover.jQueryInterface
   $.fn[NAME].Constructor = Popover
   $.fn[NAME].noConflict = () => {
     $.fn[NAME] = JQUERY_NO_CONFLICT
-    return Popover._jQueryInterface
+    return Popover.jQueryInterface
   }
 }
 

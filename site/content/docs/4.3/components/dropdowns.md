@@ -560,12 +560,12 @@ You can also create non-interactive dropdown items with `.dropdown-item-text`. F
 
 ### Active
 
-Add `.active` to items in the dropdown to **style them as active**.
+Add `.active` to items in the dropdown to **style them as active**. To convey the active state to assistive technologies, use the `aria-current` attribute — using the `page` value for the current page, or `true` for the current item in a set.
 
 {{< example >}}
 <ul class="dropdown-menu">
   <li><a class="dropdown-item" href="#">Regular link</a></li>
-  <li><a class="dropdown-item active" href="#">Active link</a></li>
+  <li><a class="dropdown-item active" href="#" aria-current="true">Active link</a></li>
   <li><a class="dropdown-item" href="#">Another link</a></li>
 </ul>
 {{< /example >}}
@@ -689,15 +689,15 @@ Put a form within a dropdown menu, or make it into a dropdown menu, and use [mar
 {{< example >}}
 <div class="dropdown-menu">
   <form class="px-4 py-3">
-    <div class="form-group">
+    <div class="mb-3">
       <label for="exampleDropdownFormEmail1">Email address</label>
       <input type="email" class="form-control" id="exampleDropdownFormEmail1" placeholder="email@example.com">
     </div>
-    <div class="form-group">
+    <div class="mb-3">
       <label for="exampleDropdownFormPassword1">Password</label>
       <input type="password" class="form-control" id="exampleDropdownFormPassword1" placeholder="Password">
     </div>
-    <div class="form-group">
+    <div class="mb-3">
       <div class="form-check">
         <input type="checkbox" class="form-check-input" id="dropdownCheck">
         <label class="form-check-label" for="dropdownCheck">
@@ -715,15 +715,15 @@ Put a form within a dropdown menu, or make it into a dropdown menu, and use [mar
 
 {{< example >}}
 <form class="dropdown-menu p-4">
-  <div class="form-group">
+  <div class="mb-3">
     <label for="exampleDropdownFormEmail2">Email address</label>
     <input type="email" class="form-control" id="exampleDropdownFormEmail2" placeholder="email@example.com">
   </div>
-  <div class="form-group">
+  <div class="mb-3">
     <label for="exampleDropdownFormPassword2">Password</label>
     <input type="password" class="form-control" id="exampleDropdownFormPassword2" placeholder="Password">
   </div>
-  <div class="form-group">
+  <div class="mb-3">
     <div class="form-check">
       <input type="checkbox" class="form-check-input" id="dropdownCheck2">
       <label class="form-check-label" for="dropdownCheck2">
@@ -855,6 +855,12 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
       <td>'dynamic'</td>
       <td>By default, we use Popper.js for dynamic positioning. Disable this with <code>static</code>.</td>
     </tr>
+    <tr>
+      <td>popperConfig</td>
+      <td>null | object</td>
+      <td>null</td>
+      <td>To change Bootstrap's default Popper.js config, see <a href="https://popper.js.org/popper-documentation.html#Popper.Defaults">Popper.js's configuration</a></td>
+    </tr>
   </tbody>
 </table>
 
@@ -862,7 +868,7 @@ Note when `boundary` is set to any value other than `'scrollParent'`, the style 
 
 ### Methods
 
-<table>
+<table class="table">
   <thead>
     <tr>
       <th>Method</th>
@@ -901,7 +907,7 @@ Note when `boundary` is set to any value other than `'scrollParent'`, the style 
       </td>
     </tr>
     <tr>
-      <td><code>_getInstance</code></td>
+      <td><code>getInstance</code></td>
       <td>
         Static method which allows you to get the dropdown instance associated with a DOM element.
       </td>
@@ -914,7 +920,7 @@ Note when `boundary` is set to any value other than `'scrollParent'`, the style 
 All dropdown events are fired at the `.dropdown-menu`'s parent element and have a `relatedTarget` property, whose value is the toggling anchor element.
 `hide.bs.dropdown` and `hidden.bs.dropdown` events have a `clickEvent` property (only when the original Event type is `click`) that contains an Event Object for the click event.
 
-<table>
+<table class="table">
   <thead>
     <tr>
       <th>Method</th>

@@ -11,7 +11,7 @@ toc: true
 
 ## Examples
 
-Alerts are available for any length of text, as well as an optional dismiss button. For proper styling, use one of the eight **required** contextual classes (e.g., `.alert-success`). For inline dismissal, use the [alerts JavaScript plugin](#dismissing).
+Alerts are available for any length of text, as well as an optional close button. For proper styling, use one of the eight **required** contextual classes (e.g., `.alert-success`). For inline dismissal, use the [alerts JavaScript plugin](#dismissing).
 
 {{< example >}}
 {{< alerts.inline >}}
@@ -58,8 +58,8 @@ Alerts can also contain additional HTML elements like headings, paragraphs and d
 Using the alert JavaScript plugin, it's possible to dismiss any alert inline. Here's how:
 
 - Be sure you've loaded the alert plugin, or the compiled Bootstrap JavaScript.
-- Add a dismiss button and the `.alert-dismissible` class, which adds extra padding to the right of the alert and positions the `.close` button.
-- On the dismiss button, add the `data-dismiss="alert"` attribute, which triggers the JavaScript functionality. Be sure to use the `<button>` element with it for proper behavior across all devices.
+- Add a [close button]({{< docsref "/components/close-button" >}}) and the `.alert-dismissible` class, which adds extra padding to the right of the alert and positions the close button.
+- On the close button, add the `data-dismiss="alert"` attribute, which triggers the JavaScript functionality. Be sure to use the `<button>` element with it for proper behavior across all devices.
 - To animate alerts when dismissing them, be sure to add the `.fade` and `.show` classes.
 
 You can see this in action with a live demo:
@@ -107,7 +107,7 @@ var bsAlert = new bootstrap.Alert(myAlert)
 
 This makes an alert listen for click events on descendant elements which have the `data-dismiss="alert"` attribute. (Not necessary when using the data-api's auto-initialization.)
 
-<table>
+<table class="table">
   <thead>
     <tr>
       <th>Method</th>
@@ -133,10 +133,10 @@ This makes an alert listen for click events on descendant elements which have th
     </tr>
     <tr>
       <td>
-        <code>_getInstance</code>
+        <code>getInstance</code>
       </td>
       <td>
-        Static method which allows you to get the alert instance associated to a DOM element, you can use it like this: <code>bootstrap.Alert._getInstance(alert)</code>
+        Static method which allows you to get the alert instance associated to a DOM element, you can use it like this: <code>bootstrap.Alert.getInstance(alert)</code>
       </td>
     </tr>
   </tbody>
@@ -144,7 +144,7 @@ This makes an alert listen for click events on descendant elements which have th
 
 {{< highlight js >}}
 var alertNode = document.querySelector('.alert')
-var alert = bootstrap.Alert._getInstance(alertNode)
+var alert = bootstrap.Alert.getInstance(alertNode)
 alert.close()
 {{< /highlight >}}
 
@@ -152,7 +152,7 @@ alert.close()
 
 Bootstrap's alert plugin exposes a few events for hooking into alert functionality.
 
-<table>
+<table class="table">
   <thead>
     <tr>
       <th>Event</th>

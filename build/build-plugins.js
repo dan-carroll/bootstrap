@@ -1,7 +1,7 @@
 /*!
  * Script to build our plugins to use them separately.
- * Copyright 2019 The Bootstrap Authors
- * Copyright 2019 Twitter, Inc.
+ * Copyright 2020 The Bootstrap Authors
+ * Copyright 2020 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
 
@@ -12,7 +12,6 @@ const rollup = require('rollup')
 const babel = require('rollup-plugin-babel')
 const banner = require('./banner.js')
 
-const TEST = process.env.NODE_ENV === 'test'
 const plugins = [
   babel({
     // Only transpile our source code
@@ -45,12 +44,7 @@ const bsPlugins = {
   Toast: path.resolve(__dirname, '../js/src/toast.js'),
   Tooltip: path.resolve(__dirname, '../js/src/tooltip.js')
 }
-const rootPath = TEST ? '../js/coverage/dist/' : '../js/dist/'
-
-if (TEST) {
-  bsPlugins.Util = path.resolve(__dirname, '../js/src/util/index.js')
-  bsPlugins.Sanitizer = path.resolve(__dirname, '../js/src/util/sanitizer.js')
-}
+const rootPath = path.resolve(__dirname, '../js/dist/')
 
 const defaultPluginConfig = {
   external: [
@@ -178,7 +172,7 @@ function build(plugin) {
       name: plugin,
       sourcemap: true,
       globals,
-      file: path.resolve(__dirname, `${pluginPath}${pluginFilename}`)
+      file: path.resolve(__dirname, `${pluginPath}/${pluginFilename}`)
     })
       .then(() => console.log(`Building ${plugin} plugin... Done!`))
       .catch(error => console.error(`${plugin}: ${error}`))
